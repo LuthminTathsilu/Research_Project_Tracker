@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/principalInvestigator")
@@ -35,5 +37,33 @@ public class PrincipalInvestigatorController {
             return new ResponseEntity<>(userDTO, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    // View All Principal Investigators
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserDto>> getAllPrincipalInvestigators(){
+        List<UserDto> userList = Arrays.asList(
+                new UserDto("U001", "principal_investigator",
+                        "SecurePass123!", "Dr. Ayesha Fernando",
+                        Role.PrincipalInvestigator, LocalDateTime.now()),
+
+                new UserDto("U002", "admin_user",
+                        "AdminPass456!", "Ravindu Perera",
+                        Role.Admin, LocalDateTime.now()),
+
+                new UserDto("U003", "research_member",
+                        "Research789!", "Isuru Wijesinghe",
+                        Role.ResearchMember, LocalDateTime.now()),
+
+                new UserDto("U004", "viewer_user",
+                        "Viewer321!", "Nimasha Gunawardena",
+                        Role.Viewer, LocalDateTime.now()),
+
+                new UserDto("U005", "assistant_investigator",
+                        "Assist987!", "Kavindu Silva",
+                        Role.PrincipalInvestigator, LocalDateTime.now())
+        );
+
+        return new  ResponseEntity<>(userList, HttpStatus.OK);
     }
 }
