@@ -66,4 +66,12 @@ public class PrincipalInvestigatorController {
 
         return new  ResponseEntity<>(userList, HttpStatus.OK);
     }
+
+    // Update Principal Investigator
+    @PatchMapping
+    public void updatePrincipalInvestigator(@RequestParam String Id, @RequestParam String pass, @RequestBody UserDto toBeUpdatedStudentDetails){
+        System.out.println("Principal Investigator ID: "+Id);
+        System.out.println("Principal Investigator Password: "+pass);
+        System.out.println("To be updated details "+toBeUpdatedStudentDetails);
+    }
 }
