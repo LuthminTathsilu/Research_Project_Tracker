@@ -74,4 +74,10 @@ public class PrincipalInvestigatorController {
         System.out.println("Principal Investigator Password: "+pass);
         System.out.println("To be updated details "+toBeUpdatedStudentDetails);
     }
+    // Delete Principal Investigator
+    @DeleteMapping
+    public void deleteStudent(@RequestHeader ("X-principalInvestigatorId") String principalInvestigatorId){
+        System.out.println("To be deleted ID: "+principalInvestigatorId);
+    }
+
 }
