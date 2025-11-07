@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dao.AdminDao;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.UserDto;
 import lk.ijse.CMJD110.Research_Project_Tracker.Entity.AdminEntity;
+import lk.ijse.CMJD110.Research_Project_Tracker.Exceptions.UserNotFoundException;
 import lk.ijse.CMJD110.Research_Project_Tracker.Service.AdminService;
 import lk.ijse.CMJD110.Research_Project_Tracker.Util.EntityDTOConversionHandling;
 import lk.ijse.CMJD110.Research_Project_Tracker.Util.IDGenerator;
@@ -29,10 +30,10 @@ public class AdminIMPL implements AdminService {
     }
 
     @Override
-    public UserDto getSelectedAdmin(String adminId) throws Exception {
+    public UserDto getSelectedAdmin(String adminId) {
         Optional<AdminEntity> foundAdmin = adminDao.findById(adminId);
         if (foundAdmin.isEmpty()) {
-            throw new Exception("Admin not found");
+            throw new UserNotFoundException("Admin not found with id: " + adminId);
         }
         return conversionHandling.toAdminDto(foundAdmin.get());
     }
@@ -43,10 +44,10 @@ public class AdminIMPL implements AdminService {
     }
 
     @Override
-    public void updateAdmin(String adminId, UserDto updatedAdmin) throws Exception {
+    public void updateAdmin(String adminId, UserDto updatedAdmin) {
         Optional<AdminEntity> foundAdmin = adminDao.findById(adminId);
         if (foundAdmin.isEmpty()) {
-            throw new Exception("Admin not found");
+            throw new UserNotFoundException("Admin not found with id: " + adminId);
         }
         AdminEntity entity = foundAdmin.get();
         entity.setFullName(updatedAdmin.getFullname());
@@ -55,10 +56,10 @@ public class AdminIMPL implements AdminService {
     }
 
     @Override
-    public void deleteAdmin(String adminId) throws Exception {
+    public void deleteAdmin(String adminId) {
         Optional<AdminEntity> foundAdmin = adminDao.findById(adminId);
         if (foundAdmin.isEmpty()) {
-            throw new Exception("Admin not found");
+            throw new UserNotFoundException("Admin not found with id: " + adminId);
         }
         adminDao.deleteById(adminId);
     }

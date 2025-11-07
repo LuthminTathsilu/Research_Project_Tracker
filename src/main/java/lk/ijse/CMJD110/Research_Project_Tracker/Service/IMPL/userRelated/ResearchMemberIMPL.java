@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dao.ResearchMemberDao;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.UserDto;
 import lk.ijse.CMJD110.Research_Project_Tracker.Entity.MemberEntity;
+import lk.ijse.CMJD110.Research_Project_Tracker.Exceptions.UserNotFoundException;
 import lk.ijse.CMJD110.Research_Project_Tracker.Service.ResearchMemberService;
 import lk.ijse.CMJD110.Research_Project_Tracker.Util.EntityDTOConversionHandling;
 import lk.ijse.CMJD110.Research_Project_Tracker.Util.IDGenerator;
@@ -29,10 +30,10 @@ public class ResearchMemberIMPL implements ResearchMemberService {
     }
 
     @Override
-    public UserDto getSelectedResearchMember(String memberId) throws Exception {
+    public UserDto getSelectedResearchMember(String memberId) {
         Optional<MemberEntity> foundMember = researchMemberDao.findById(memberId);
         if (foundMember.isEmpty()) {
-            throw new Exception("Research Member not found");
+            throw new UserNotFoundException("Research Member not found with id: " + memberId);
         }
         return conversionHandling.toResearchMemberDto(foundMember.get());
     }
@@ -43,10 +44,10 @@ public class ResearchMemberIMPL implements ResearchMemberService {
     }
 
     @Override
-    public void updateResearchMember(String memberId, UserDto updatedMember) throws Exception {
+    public void updateResearchMember(String memberId, UserDto updatedMember) {
         Optional<MemberEntity> foundMember = researchMemberDao.findById(memberId);
         if (foundMember.isEmpty()) {
-            throw new Exception("Research Member not found");
+            throw new UserNotFoundException("Research Member not found with id: " + memberId);
         }
         MemberEntity entity = foundMember.get();
         entity.setFullName(updatedMember.getFullname());
@@ -55,10 +56,10 @@ public class ResearchMemberIMPL implements ResearchMemberService {
     }
 
     @Override
-    public void deleteResearchMember(String memberId) throws Exception {
+    public void deleteResearchMember(String memberId) {
         Optional<MemberEntity> foundMember = researchMemberDao.findById(memberId);
         if (foundMember.isEmpty()) {
-            throw new Exception("Research Member not found");
+            throw new UserNotFoundException("Research Member not found with id: " + memberId);
         }
         researchMemberDao.deleteById(memberId);
     }

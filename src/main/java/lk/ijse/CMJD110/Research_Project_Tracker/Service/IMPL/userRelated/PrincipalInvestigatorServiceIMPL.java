@@ -1,9 +1,10 @@
-package lk.ijse.CMJD110.Research_Project_Tracker.Service.IMPL;
+package lk.ijse.CMJD110.Research_Project_Tracker.Service.IMPL.userRelated;
 
 import jakarta.transaction.Transactional;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dao.PrincipalInvestigatorDao;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.UserDto;
 import lk.ijse.CMJD110.Research_Project_Tracker.Entity.PIEntity;
+import lk.ijse.CMJD110.Research_Project_Tracker.Exceptions.UserNotFoundException;
 import lk.ijse.CMJD110.Research_Project_Tracker.Service.PrincipalInvestigatorService;
 import lk.ijse.CMJD110.Research_Project_Tracker.Util.EntityDTOConversionHandling;
 import lk.ijse.CMJD110.Research_Project_Tracker.Util.IDGenerator;
@@ -29,24 +30,24 @@ public class PrincipalInvestigatorServiceIMPL implements PrincipalInvestigatorSe
     }
 
     @Override
-    public UserDto getSelectedPrincipalInvestigator(String piId) throws Exception {
+    public UserDto getSelectedPrincipalInvestigator(String piId) {
         Optional<PIEntity> foundPI = principalInvestigatorDao.findById(piId);
         if (foundPI.isEmpty()) {
-            throw new Exception("Principal Investigator not found");
+            throw new UserNotFoundException("Principal Investigator not found with id: " + piId);
         }
         return conversionHandling.toPrincipalInvestigatorDto(foundPI.get());
     }
 
     @Override
     public List<UserDto> getAllPrincipalInvestigators() {
-        return conversionHandling.getUserDtoList(principalInvestigatorDao.findAll());
+        return conversionHandling.getPrincipalInvestigatorDtoList(principalInvestigatorDao.findAll());
     }
 
     @Override
-    public void updatePrincipalInvestigator(String piId, UserDto updatedPI) throws Exception {
+    public void updatePrincipalInvestigator(String piId, UserDto updatedPI) {
         Optional<PIEntity> foundPI = principalInvestigatorDao.findById(piId);
         if (foundPI.isEmpty()) {
-            throw new Exception("Principal Investigator not found");
+            throw new UserNotFoundException("Principal Investigator not found with id: " + piId);
         }
         PIEntity entity = foundPI.get();
         entity.setFullName(updatedPI.getFullname());
@@ -55,10 +56,10 @@ public class PrincipalInvestigatorServiceIMPL implements PrincipalInvestigatorSe
     }
 
     @Override
-    public void deletePrincipalInvestigator(String piId) throws Exception {
+    public void deletePrincipalInvestigator(String piId) {
         Optional<PIEntity> foundPI = principalInvestigatorDao.findById(piId);
         if (foundPI.isEmpty()) {
-            throw new Exception("Principal Investigator not found");
+            throw new UserNotFoundException("Principal Investigator not found with id: " + piId);
         }
         principalInvestigatorDao.deleteById(piId);
     }
