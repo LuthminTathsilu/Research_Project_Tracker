@@ -1,99 +1,73 @@
 package lk.ijse.CMJD110.Research_Project_Tracker.Controller;
 
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.DocumentDto;
-import lk.ijse.CMJD110.Research_Project_Tracker.Dto.ProjectDto;
-import lk.ijse.CMJD110.Research_Project_Tracker.Dto.UserDto;
+import lk.ijse.CMJD110.Research_Project_Tracker.Exceptions.DocumentNotFoundException;
+import lk.ijse.CMJD110.Research_Project_Tracker.Service.DocumentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/document")
+@RequiredArgsConstructor
 public class DocumentController {
 
-    // In-memory mock database (you can replace this later with service/DB)
-    private final List<DocumentDto> documentStore = new ArrayList<>();
+    private final DocumentService documentService;
 
-    //  Upload a document
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DocumentDto> uploadDocument(
-            @RequestParam String documentId,
-            @RequestParam String projectId,
-            @RequestParam String uploadedBy,
+    // Upload a new document
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> uploadDocument(
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam MultipartFile file,
-            @RequestParam(required = false) String uploadedAt
+            @RequestParam(required = false) String uploadedAt,
+            @RequestParam String projectId,
+            @RequestParam String uploadedBy
     ) {
-        DocumentDto documentDto = new DocumentDto();
-
         try {
-            byte[] fileBytes = file.getBytes();
-            String base64File = Base64.getEncoder().encodeToString(fileBytes);
-
-            String uploadTime = uploadedAt != null ? uploadedAt :
-                    LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-
-            documentDto.setId(documentId);
-            documentDto.setProject(new ProjectDto(projectId, null, null, null, null, null, null, null, null, null));
-            documentDto.setTitle(title);
-            documentDto.setDescription(description);
-            documentDto.setUrlOrPath(base64File);
-            documentDto.setUploadedBy(new UserDto(uploadedBy, null, null, null, null, null));
-            documentDto.setUploadedAt(uploadTime);
-
-
-            documentStore.add(documentDto);
-
+            documentService.uploadDocument(title, description, file, uploadedAt, projectId, uploadedBy);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (IOException | DocumentNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return ResponseEntity.ok(documentDto);
     }
 
-    //  List all documents for a specific project
-    @GetMapping(value = "/api/projects/{projectId}/documents", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<DocumentDto>> getDocumentsByProject(@PathVariable String projectId) {
-        // Filter documents by project ID
-        List<DocumentDto> filteredDocs = new ArrayList<>();
-        for (DocumentDto doc : documentStore) {
-            if (doc.getProject() != null && doc.getProject().getId().equals(projectId)) {
-                filteredDocs.add(doc);
-            }
+    //  Get document by ID
+    @GetMapping("{docId}")
+    public ResponseEntity<DocumentDto> getSelectedDocument(@PathVariable String docId) {
+        try {
+            return new ResponseEntity<>(documentService.getSelectedDocument(docId), HttpStatus.OK);
+        } catch (DocumentNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return ResponseEntity.ok(filteredDocs);
     }
 
-
-    // Delete document (only Admin or PI)
-
-    @DeleteMapping("/documents/{id}")
-    public ResponseEntity<String> deleteDocument(
-            @PathVariable String id,
-            @RequestHeader("X-User-Role") String userRole // temporary role check
-    ) {
-        // Check role validity
-        if (!(userRole.equalsIgnoreCase("Admin") || userRole.equalsIgnoreCase("PrincipalInvestigator"))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Access denied: only Admin or Principal Investigator can delete documents.");
+    // Delete document
+    @DeleteMapping("{docId}")
+    public ResponseEntity<Void> deleteDocument(@PathVariable("docId") String documentId) {
+        try {
+            documentService.deleteDocument(documentId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (DocumentNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-
-        boolean removed = documentStore.removeIf(doc -> doc.getId().equals(id));
-
-        if (!removed) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Document with ID " + id + " not found.");
-        }
-
-        return ResponseEntity.ok("Document " + id + " deleted successfully.");
     }
 }
