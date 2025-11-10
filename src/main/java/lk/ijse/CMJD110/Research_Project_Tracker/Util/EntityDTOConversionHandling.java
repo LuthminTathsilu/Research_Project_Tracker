@@ -6,13 +6,16 @@ import lk.ijse.CMJD110.Research_Project_Tracker.Dto.DocumentDto;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.MilestoneDto;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.ProjectDto;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.UserDto;
+import lk.ijse.CMJD110.Research_Project_Tracker.Dto.secure.SecureUserDTO;
 import lk.ijse.CMJD110.Research_Project_Tracker.Entity.*;
+import lk.ijse.CMJD110.Research_Project_Tracker.Entity.secure.SecureUserEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Component
@@ -22,39 +25,42 @@ public class EntityDTOConversionHandling {
     private final ProjectDao projectDao;
     private final ResearchMemberDao researchMemberDao;
 
-    //PrincipalInvestigator
-
-    public UserDto toPrincipalInvestigatorDto (PIEntity PrincipalInvestigator){
-        return modelMapper.map(PrincipalInvestigator,UserDto.class);
-    }
-    public PIEntity toPIEntity (UserDto userDto){
-        return modelMapper.map(userDto,PIEntity.class);
-    }
-    public List<UserDto> getUserDtoList (List<PIEntity> piEntityList){
-        return modelMapper.map(piEntityList,new TypeToken<List<UserDto>>(){}.getType());
+    public UserDto toPrincipalInvestigatorDto(PIEntity piEntity) {
+        return modelMapper.map(piEntity, UserDto.class);
     }
 
-    //Research Members
-    public UserDto toResearchMemberDto (MemberEntity ResearchMember){
-        return modelMapper.map(ResearchMember,UserDto.class);
-    }
-    public MemberEntity toMemberEntity (UserDto userDto){
-        return modelMapper.map(userDto,MemberEntity.class);
-    }
-    public List<MemberEntity> getMemberDtoList (List<MemberEntity> memberEntityList){
-         return modelMapper.map(memberEntityList,new TypeToken<List<UserDto>>(){}.getType());
+    public PIEntity toPIEntity(UserDto userDto) {
+        return modelMapper.map(userDto, PIEntity.class);
     }
 
-    //Admin
+    public List<UserDto> getPrincipalInvestigatorDtoList(List<PIEntity> piEntityList) {
+        return modelMapper.map(piEntityList, new TypeToken<List<UserDto>>() {}.getType());
+    }
 
-    public UserDto toAdminDto (AdminEntity Admin){
-        return modelMapper.map(Admin,UserDto.class);
+    //  Research Members
+    public UserDto toResearchMemberDto(MemberEntity memberEntity) {
+        return modelMapper.map(memberEntity, UserDto.class);
     }
-    public AdminEntity toAdminEntity (UserDto userDto){
-        return modelMapper.map(userDto,AdminEntity.class);
+
+    public MemberEntity toMemberEntity(UserDto userDto) {
+        return modelMapper.map(userDto, MemberEntity.class);
     }
-    public List<AdminEntity> getAdminDtoList (List<AdminEntity> adminEntityList){
-        return modelMapper.map(adminEntityList,new TypeToken<List<UserDto>>(){}.getType());
+
+    public List<UserDto> getResearchMemberDtoList(List<MemberEntity> memberEntityList) {
+        return modelMapper.map(memberEntityList, new TypeToken<List<UserDto>>() {}.getType());
+    }
+
+    //  Admin
+    public UserDto toAdminDto(AdminEntity adminEntity) {
+        return modelMapper.map(adminEntity, UserDto.class);
+    }
+
+    public AdminEntity toAdminEntity(UserDto userDto) {
+        return modelMapper.map(userDto, AdminEntity.class);
+    }
+
+    public List<UserDto> getAdminDtoList(List<AdminEntity> adminEntityList) {
+        return modelMapper.map(adminEntityList, new TypeToken<List<UserDto>>() {}.getType());
     }
 
     //Document
@@ -65,7 +71,7 @@ public class EntityDTOConversionHandling {
         dto.setId(documentEntity.getDocumentId());
         dto.setTitle(documentEntity.getTitle());
         dto.setDescription(documentEntity.getDescription());
-        dto.setUrlOrPath(documentEntity.getFilePath());
+        dto.setUrlOrPath(Base64.getEncoder().encodeToString(documentEntity.getFilePath()));
         dto.setUploadedAt(String.valueOf(documentEntity.getUploadedAt()));
 
         if (documentEntity.getProject() != null) {
@@ -96,7 +102,8 @@ public class EntityDTOConversionHandling {
         entity.setDocumentId(documentDTO.getId());
         entity.setTitle(documentDTO.getTitle());
         entity.setDescription(documentDTO.getDescription());
-        entity.setFilePath(documentDTO.getUrlOrPath());
+        entity.setFilePath(Base64.getDecoder().decode(documentDTO.getUrlOrPath()));
+
         entity.setUploadedAt(LocalDateTime.parse(documentDTO.getUploadedAt()));
 
         if (documentDTO.getProject() != null && documentDTO.getProject().getId() != null) {
@@ -242,5 +249,11 @@ public class EntityDTOConversionHandling {
     public List<MilestoneEntity> toMilestoneEntityList(List<MilestoneDto> dtos) {
         return dtos.stream().map(this::toMilestoneEntity).toList();
     }
-
+    // user
+    public SecureUserDTO toSecureUserDTO(SecureUserEntity secureUserEntity) {
+        return modelMapper.map(secureUserEntity, SecureUserDTO.class);
+    }
+    public SecureUserEntity toSecureUserEntity(SecureUserDTO secureUserDTO){
+        return modelMapper.map(secureUserDTO, SecureUserEntity.class);
+    }
 }
