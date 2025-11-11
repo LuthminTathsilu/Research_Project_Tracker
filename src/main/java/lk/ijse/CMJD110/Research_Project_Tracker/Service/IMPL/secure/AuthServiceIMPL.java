@@ -1,26 +1,49 @@
 package lk.ijse.CMJD110.Research_Project_Tracker.Service.IMPL.secure;
 
-
 import jakarta.transaction.Transactional;
-
+import lk.ijse.CMJD110.Research_Project_Tracker.Dao.secure.UserSecureDao;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.secure.JWTResponse;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.secure.SecureUserDTO;
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.secure.UserLogin;
 import lk.ijse.CMJD110.Research_Project_Tracker.Service.AuthService;
+import lk.ijse.CMJD110.Research_Project_Tracker.Util.EntityDTOConversionHandling;
+import lk.ijse.CMJD110.Research_Project_Tracker.Util.IDGenerator;
+import lk.ijse.CMJD110.Research_Project_Tracker.secureConfig.JWTUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AuthServiceIMPL implements AuthService {
+    private final UserSecureDao userSecureDao;
+    private final JWTUtils jwtUtils;
+    private final EntityDTOConversionHandling entityDTOConversionHandle;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+
+
     @Override
     public JWTResponse SignIn(UserLogin userLogin) {
-        return null;
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userLogin.getUsername(), userLogin.getPassword()));
+        var signedUser = userSecureDao.findByUsername(userLogin.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+        var generatedToken = jwtUtils.generateToken(signedUser.getUsername(),signedUser.getAuthorities());
+        return JWTResponse.builder().token(generatedToken).build();
+
     }
 
     @Override
     public JWTResponse SignUp(SecureUserDTO secureUserDTO) {
-        return null;
+        secureUserDTO.setId(IDGenerator.userIdGen());
+        secureUserDTO.setPassword(passwordEncoder.encode(secureUserDTO.getPassword()));
+        var savedUser = userSecureDao.save(entityDTOConversionHandle.toSecureUserEntity(secureUserDTO));
+        var genToken = jwtUtils.generateToken(savedUser.getUsername(),savedUser.getAuthorities());
+        return JWTResponse.builder().token(genToken).build();
     }
 }
