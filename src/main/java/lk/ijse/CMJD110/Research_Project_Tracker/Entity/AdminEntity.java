@@ -2,6 +2,7 @@ package lk.ijse.CMJD110.Research_Project_Tracker.Entity;
 
 
 import jakarta.persistence.*;
+import lk.ijse.CMJD110.Research_Project_Tracker.Dto.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class AdminEntity {
     private String password;
 
     private String fullName;
-    private String email;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     private LocalDateTime createdAt;
 }

@@ -6,9 +6,11 @@ import lk.ijse.CMJD110.Research_Project_Tracker.Entity.MilestoneEntity;
 import lk.ijse.CMJD110.Research_Project_Tracker.Exceptions.MilestoneNotFoundException;
 import lk.ijse.CMJD110.Research_Project_Tracker.Service.MilestoneService;
 import lk.ijse.CMJD110.Research_Project_Tracker.Util.EntityDTOConversionHandling;
+import lk.ijse.CMJD110.Research_Project_Tracker.Util.IDGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,9 +33,8 @@ public class MilestoneIMPL implements MilestoneService {
 
     @Override
     public MilestoneDto addMilestone(String projectId, MilestoneDto milestoneDto) {
-        if (milestoneDto.getId() == null || milestoneDto.getId().isEmpty()) {
-            milestoneDto.setId(UUID.randomUUID().toString());
-        }
+        // Auto-generate milestone ID
+        milestoneDto.setId(IDGenerator.milestoneIdGen());
 
         if (milestoneDto.getProject() == null) {
             milestoneDto.setProject(new lk.ijse.CMJD110.Research_Project_Tracker.Dto.ProjectDto());
@@ -42,8 +43,10 @@ public class MilestoneIMPL implements MilestoneService {
 
         var entity = conversion.toMilestoneEntity(milestoneDto);
         milestoneDao.save(entity);
+
         return conversion.toMilestoneDTO(entity);
     }
+
 
     @Override
     public MilestoneDto updateMilestone(String id, MilestoneDto updatedMilestone) {

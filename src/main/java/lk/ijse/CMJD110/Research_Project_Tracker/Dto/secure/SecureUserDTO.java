@@ -5,17 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class SecureUserDTO implements Serializable {
+public class SecureUserDTO {
     private String id;
     private String username;
     private String password;
     private String fullname;
-    private Role role;
+    private Role role; // This allows the client to choose the role
     private LocalDateTime createdAt;
 }

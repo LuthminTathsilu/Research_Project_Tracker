@@ -25,6 +25,7 @@ public class SecureUserEntity implements Serializable, UserDetails {
     private String username;
     private String password;
     private String fullname;
+    @Enumerated(EnumType.STRING)
     private Role role;
     private LocalDateTime createdAt;
 
@@ -37,5 +38,30 @@ public class SecureUserEntity implements Serializable, UserDetails {
     public String getUsername() {
         return username;
     }
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 
 }

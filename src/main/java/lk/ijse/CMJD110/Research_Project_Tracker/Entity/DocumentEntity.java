@@ -23,7 +23,9 @@ public class DocumentEntity {
 
     private String title;
     private String description;
-    private String filePath;
+    @Column(name="file_path", columnDefinition="LONGBLOB")
+    private byte[] filePath;
+
 
     @ManyToOne
     @JoinColumn(name = "uploaded_by", referencedColumnName = "memberId")

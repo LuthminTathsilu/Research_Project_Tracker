@@ -1,4 +1,4 @@
-package lk.ijse.CMJD110.Research_Project_Tracker.Controller;
+package lk.ijse.CMJD110.Research_Project_Tracker.Controller.common;
 
 import lk.ijse.CMJD110.Research_Project_Tracker.Dto.UserDto;
 import lk.ijse.CMJD110.Research_Project_Tracker.Service.PrincipalInvestigatorService;
@@ -17,14 +17,14 @@ public class PrincipalInvestigatorController {
 
     private final PrincipalInvestigatorService principalInvestigatorService;
 
-    // ✅ Save Principal Investigator
+    //  Save Principal Investigator
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> savePrincipalInvestigator(@RequestBody UserDto userDTO) {
         principalInvestigatorService.savePrincipalInvestigator(userDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    // ✅ Get Selected Principal Investigator
+    //  Get Selected Principal Investigator
     @GetMapping(value = "{piId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> getSelectedPrincipalInvestigator(@PathVariable String piId) {
         try {
@@ -36,13 +36,13 @@ public class PrincipalInvestigatorController {
         }
     }
 
-    // ✅ Get All Principal Investigators
+    //  Get All Principal Investigators
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserDto>> getAllPrincipalInvestigators() {
         return new ResponseEntity<>(principalInvestigatorService.getAllPrincipalInvestigators(), HttpStatus.OK);
     }
 
-    // ✅ Update Principal Investigator
+    // Update Principal Investigator
     @PatchMapping
     public ResponseEntity<Void> updatePrincipalInvestigator(@RequestParam("id") String piId,
                                                             @RequestBody UserDto toBeUpdatedPI) {
@@ -55,7 +55,7 @@ public class PrincipalInvestigatorController {
         }
     }
 
-    // ✅ Delete Principal Investigator
+    //  Delete Principal Investigator
     @DeleteMapping("{piId}")
     public ResponseEntity<Void> deletePrincipalInvestigator(@PathVariable String piId) {
         try {

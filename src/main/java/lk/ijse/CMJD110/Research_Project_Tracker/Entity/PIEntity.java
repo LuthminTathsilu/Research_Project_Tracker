@@ -2,11 +2,12 @@ package lk.ijse.CMJD110.Research_Project_Tracker.Entity;
 
 
 import jakarta.persistence.*;
+import lk.ijse.CMJD110.Research_Project_Tracker.Dto.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,16 +24,9 @@ public class PIEntity {
 
     @Column(nullable = false)
     private String password;
-
     private String fullName;
-    private String department;
-    private String email;
-    private LocalDateTime joinedAt;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    private LocalDateTime createdAt;
 
-
-    @OneToMany(mappedBy = "supervisor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberEntity> members;
-
-    @OneToMany(mappedBy = "pi", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectEntity> projects;
 }
